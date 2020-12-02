@@ -11,10 +11,9 @@ client.on('ready', () => {
 });
 
 client.on('message', msg => {
-  if (msg.content.includes('gay')) {
-    msg.reply('Gay means happy');
+  if (msg.content.includes('ping')) {
+    msg.reply('pong');
   }
-
 });
 
 // sends a welcome message if a user joins
@@ -23,7 +22,5 @@ client.on('guildMemberAdd', member => {
   if (!channel) return;
   channel.send('Welcome to the Mushroom Cave' + ' ' + member.displayName + '!');
 });
-
-
 
 client.login(config.token);
