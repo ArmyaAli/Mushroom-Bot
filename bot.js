@@ -1,15 +1,23 @@
 const Discord = require('discord.js');
 require('dotenv').config();
 const client = new Discord.Client();
+const generalChannel = '143853351103102976';
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
 client.on('message', msg => {
-  if (msg.content === 'ping') {
-    msg.reply('pong');
+  if (msg.content.includes('gay')) {
+    msg.reply('Gay means happy');
   }
 });
 
-client.login('token');
+// sends a welcome message if a user joins
+client.on('guildMemberAdd', member => {
+  const channel = member.guild.channels.cache.find(ch => ch.id == generalChannel);
+  if (!channel) return;
+  channel.send('Welcome to the Mushroom Cave' + ' ' + member.displayName + '!');
+});
+
+client.login(process.env.BOT_TOKEN);
