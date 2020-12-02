@@ -1,7 +1,7 @@
 {
   "name": "mushroombot",
   "version": "1.0.0",
-  "description": "",
+  "description": "Discord bot build by me! Ali Umar",
   "main": "bot.js",
   "scripts": {
     "start": "node bot.js",
