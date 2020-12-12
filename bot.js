@@ -48,6 +48,8 @@ client.on("message", async (message) => {
     client.commands.get("pause").execute(client.player, message);
   } else if(command === "resume") {
     client.commands.get("resume").execute(client.player, message);
+  } else if(command === "stop") {
+    client.commands.get("stop").execute(client.player, message);
   }
 
 });
