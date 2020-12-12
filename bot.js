@@ -2,7 +2,16 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 const fs = require("fs"); // talk to the filesystem on the os
 const config = require("./bot_config.js");
+const { Player } = require("discord-music-player");
 
+const player = new Player(client, {
+  leaveOnEnd: false,
+  leaveOnStop: true,
+  leaveOnEmpty: true,
+  quality: "high",
+});
+
+client.player = player;
 // CONSTANTS (TO DO SHOULD BE IN A SPERPATE FILE)
 const generalChannel = "143853351103102976";
 
@@ -30,9 +39,14 @@ client.on("message", async (message) => {
   if (!message.content.startsWith(config.prefix) || message.author.bot) return;
   const args = message.content.slice(config.prefix.length).trim().split(/ +/);
   const command = args.shift().toLowerCase();
+
+  if(args.length == 0) {
+    message.channel.send('Arguments are required for that command!');
+    return;
+  }
   
   if(command === 'play'){
-    client.commands.get('play').execute(message, args);
+    client.commands.get('play').execute(client.player, message, args);
   }
 });
 
