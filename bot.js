@@ -15,7 +15,6 @@ client.player = player;
 // CONSTANTS (TO DO SHOULD BE IN A SPERPATE FILE)
 const generalChannel = "143853351103102976";
 
-
 // GRAB ALL OUR COMMANDS BEFORE WE LOGIN
 const commandFiles = fs
   .readdirSync("./commands")
@@ -34,20 +33,21 @@ client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
-
 client.on("message", async (message) => {
   if (!message.content.startsWith(config.prefix) || message.author.bot) return;
   const args = message.content.slice(config.prefix.length).trim().split(/ +/);
   const command = args.shift().toLowerCase();
 
-  if(args.length == 0) {
-    message.channel.send('Arguments are required for that command!');
-    return;
+  if (command === "play") {
+    if (args.length == 0) {
+      message.channel.send("Arguments are required for that command!");
+      return;
+    }
+    client.commands.get("play").execute(client.player, message, args);
+  } else if(command === "pause") {
+    client.commands.get("pause").execute(client.player, message);
   }
-  
-  if(command === 'play'){
-    client.commands.get('play').execute(client.player, message, args);
-  }
+
 });
 
 // sends a welcome message if a user joins
