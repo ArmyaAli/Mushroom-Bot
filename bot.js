@@ -46,6 +46,8 @@ client.on("message", async (message) => {
     client.commands.get("play").execute(client.player, message, args);
   } else if(command === "pause") {
     client.commands.get("pause").execute(client.player, message);
+  } else if(command === "resume") {
+    client.commands.get("resume").execute(client.player, message);
   }
 
 });
