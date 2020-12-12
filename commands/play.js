@@ -1,7 +1,10 @@
+const { Player } = require("discord-music-player");
+const generalChannelVoice = "143853351103102977";
+
 module.exports = {
 	name: 'play',
 	description: 'play music',
-	execute(message, args) {
-		message.channel.send('Playing music from youtube: ');
+	execute(args) {
+       
 	},
 };
