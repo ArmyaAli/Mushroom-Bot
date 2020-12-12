@@ -1,15 +1,19 @@
+const filterOptions = {
+  uploadDate: 'none', // 'hour/today/week/month/year', // Default - none
+	duration: 'none', //'short/long', // Default - none
+	sortBy: 'relevance' //'relevance/date/view count/rating' // Default - 'relevance'
+};
+
 module.exports = {
   name: "play",
   description: "play music",
   async execute(player, message, args) {
     // check if there is a song already in queue
-    let isPlaying = player.isPlaying(message.guild.id);
+    const isPlaying = player.isPlaying(message.guild.id);
     const searchString = args.join(' ');
     try {
       if(!isPlaying) {
-        let song = await player.play(message.member.voice.channel, searchString, {
-          duration: "long", // This is optional
-        });
+        let song = await player.play(message.member.voice.channel, searchString, filterOptions);
         song = song.song;
         console.log(song.name);
         message.channel.send(`Started playing ${song.name}.`);
