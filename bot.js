@@ -14,19 +14,20 @@ const player = new Player(client, {
 client.player = player;
 // CONSTANTS (TO DO SHOULD BE IN A SPERPATE FILE)
 const generalChannel = "143853351103102976";
+const musicCommandPath = "./commands/music-player";
 
 // GRAB ALL OUR COMMANDS BEFORE WE LOGIN
-const commandFiles = fs
-  .readdirSync("./commands")
+const musicCommands = fs
+  .readdirSync(musicCommandPath)
   .filter((file) => file.endsWith(".js"));
 
-client.commands = new Discord.Collection();
+client.musicCommands = new Discord.Collection();
 
-for (const file of commandFiles) {
-  const command = require(`./commands/${file}`);
+for (const file of musicCommands) {
+  const command = require(musicCommandPath + "/" + `${file}`);
   // set a new item in the Collection
   // with the key as the command name and the value as the exported module
-  client.commands.set(command.name, command);
+  client.musicCommands.set(command.name, command);
 }
 
 client.on("ready", () => {
@@ -44,19 +45,19 @@ client.on("message", async (message) => {
         message.channel.send("Arguments are required for that command!");
         return;
       }
-      client.commands.get("play").execute(client.player, message, args);
+      client.musicCommands.get("play").execute(client.player, message, args);
       break;
     case "pause":
-      client.commands.get("pause").execute(client.player, message);
+      client.musicCommands.get("pause").execute(client.player, message);
       break;
     case "resume":
-      client.commands.get("resume").execute(client.player, message);
+      client.musicCommands.get("resume").execute(client.player, message);
       break;
     case "stop":
-      client.commands.get("stop").execute(client.player, message);
+      client.musicCommands.get("stop").execute(client.player, message);
       break;
     case "skip":
-      client.commands.get("skip").execute(client.player, message);
+      client.musicCommands.get("skip").execute(client.player, message);
       break;
   }
 });
