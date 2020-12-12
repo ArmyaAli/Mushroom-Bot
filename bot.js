@@ -15,18 +15,21 @@ client.player = player;
 // CONSTANTS (TO DO SHOULD BE IN A SPERPATE FILE)
 const generalChannel = "143853351103102976";
 const musicCommandPath = "./commands/music-player";
+const adminCommandPath = "./commands/admin";
 
 // GRAB ALL OUR COMMANDS BEFORE WE LOGIN
 const musicCommands = fs
   .readdirSync(musicCommandPath)
   .filter((file) => file.endsWith(".js"));
 
+const adminCommands = fs
+  .readdirSync(adminCommandPath)
+  .filter((file) => file.endsWith(".js"));
+
 client.musicCommands = new Discord.Collection();
 
 for (const file of musicCommands) {
   const command = require(musicCommandPath + "/" + `${file}`);
-  // set a new item in the Collection
-  // with the key as the command name and the value as the exported module
   client.musicCommands.set(command.name, command);
 }
 
