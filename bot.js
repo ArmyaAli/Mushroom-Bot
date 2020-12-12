@@ -38,20 +38,27 @@ client.on("message", async (message) => {
   const args = message.content.slice(config.prefix.length).trim().split(/ +/);
   const command = args.shift().toLowerCase();
 
-  if (command === "play") {
-    if (args.length == 0) {
-      message.channel.send("Arguments are required for that command!");
-      return;
-    }
-    client.commands.get("play").execute(client.player, message, args);
-  } else if(command === "pause") {
-    client.commands.get("pause").execute(client.player, message);
-  } else if(command === "resume") {
-    client.commands.get("resume").execute(client.player, message);
-  } else if(command === "stop") {
-    client.commands.get("stop").execute(client.player, message);
+  switch (command) {
+    case "play":
+      if (args.length == 0) {
+        message.channel.send("Arguments are required for that command!");
+        return;
+      }
+      client.commands.get("play").execute(client.player, message, args);
+      break;
+    case "pause":
+      client.commands.get("pause").execute(client.player, message);
+      break;
+    case "resume":
+      client.commands.get("resume").execute(client.player, message);
+      break;
+    case "stop":
+      client.commands.get("stop").execute(client.player, message);
+      break;
+    case "skip":
+      client.commands.get("skip").execute(client.player, message);
+      break;
   }
-
 });
 
 // sends a welcome message if a user joins
