@@ -4,8 +4,7 @@ module.exports = {
   async execute(player, message, args) {
     // check if there is a song already in queue
     let isPlaying = player.isPlaying(message.guild.id);
-    console.log(isPlaying)
-    const searchString = args.join(" ") + " " + "song";
+    const searchString = args.join(' ');
     try {
       if(!isPlaying) {
         let song = await player.play(message.member.voice.channel, searchString, {
