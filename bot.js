@@ -3,6 +3,7 @@ const client = new Discord.Client();
 const fs = require("fs"); // talk to the filesystem on the os
 const config = require("./bot_config.js");
 const { Player } = require("discord-music-player");
+
 const player = new Player(client, {
     leaveOnEnd: false,
     leaveOnStop: true,
@@ -39,15 +40,15 @@ client.on("message", async (message) => {
   if (!message.content.startsWith(config.prefix) || message.author.bot) return;
   const args = message.content.slice(config.prefix.length).trim().split(/ +/);
   const command = args.shift().toLowerCase();
-  // !play This is the Life
-  // will play "This is the Life" in the Voice Channel
-
+  
   if(command === 'play'){
       const searchString = args.join(' ');
       let song = await client.player.play(message.member.voice.channel, searchString, {
           duration: 'long' // This is optional
       });
+
       song = song.song;
+      console.log(song.song)
       message.channel.send(`Started playing ${song.name}.`);
   }
 });
