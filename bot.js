@@ -20,10 +20,10 @@ const generalChannel = "143853351103102976";
 
 let commandFiles = [];
 const commandContext = path.join(__dirname, "commands");
+
 function readCommandsRecursive(dir) {
   fs.readdirSync(dir).forEach((file) => {
     const Absolute = path.join(dir, file);
-    //console.log(Absolute)
     if (fs.statSync(Absolute).isDirectory())
       return readCommandsRecursive(Absolute);
     else return commandFiles.push(Absolute);
@@ -34,8 +34,8 @@ readCommandsRecursive(commandContext);
 commandFiles = commandFiles.filter((fileName) => fileName.endsWith(".js"));
 
 for (const filePath of commandFiles) {
-	const command = require(filePath);
-	client.commands.set(command.name, command);
+  const command = require(filePath);
+  client.commands.set(command.name, command);
 }
 
 client.on("ready", () => {
@@ -66,6 +66,9 @@ client.on("message", async (message) => {
       break;
     case "skip":
       client.commands.get("skip").execute(client.player, message);
+      break;
+    case "help":
+      client.commands.get("help").execute(message);
       break;
   }
 });
