@@ -1,6 +1,8 @@
-This is a discord bot that I made as small project for myself! It's called Mushroom-Bot
+This is a discord bot that I made as small project for myself! It's called Mushroom-Bot.
+
 
 Currently working features:
+
     - Help command
         - Gets a list of all the commands the user can use -> !help
     - Music Player
