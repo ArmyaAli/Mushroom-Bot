@@ -1,9 +1,11 @@
-const fs = require("fs"); // talk to the filesystem on the os
+const fs = require("fs");
+const path = require("path");
 const Discord = require("discord.js");
 const config = require("./bot_config.js");
 const { Player } = require("discord-music-player");
 
 const client = new Discord.Client();
+client.commands = new Discord.Collection();
 
 const player = new Player(client, {
   leaveOnEnd: true,
@@ -15,23 +17,25 @@ const player = new Player(client, {
 client.player = player;
 // CONSTANTS (TO DO SHOULD BE IN A SEPERATE FILE)
 const generalChannel = "143853351103102976";
-const musicCommandPath = "./commands/music-player";
-const adminCommandPath = "./commands/admin";
 
-// GRAB ALL OUR COMMANDS BEFORE WE LOGIN
-const musicCommands = fs
-  .readdirSync(musicCommandPath)
-  .filter((file) => file.endsWith(".js"));
+let commandFiles = [];
+const commandContext = path.join(__dirname, "commands");
+function readCommandsRecursive(dir) {
+  fs.readdirSync(dir).forEach((file) => {
+    const Absolute = path.join(dir, file);
+    //console.log(Absolute)
+    if (fs.statSync(Absolute).isDirectory())
+      return readCommandsRecursive(Absolute);
+    else return commandFiles.push(Absolute);
+  });
+}
 
-const adminCommands = fs
-  .readdirSync(adminCommandPath)
-  .filter((file) => file.endsWith(".js"));
+readCommandsRecursive(commandContext);
+commandFiles = commandFiles.filter((fileName) => fileName.endsWith(".js"));
 
-client.musicCommands = new Discord.Collection();
-
-for (const file of musicCommands) {
-  const command = require(musicCommandPath + "/" + `${file}`);
-  client.musicCommands.set(command.name, command);
+for (const filePath of commandFiles) {
+	const command = require(filePath);
+	client.commands.set(command.name, command);
 }
 
 client.on("ready", () => {
@@ -49,19 +53,19 @@ client.on("message", async (message) => {
         message.channel.send("Arguments are required for that command!");
         return;
       }
-      client.musicCommands.get("play").execute(client.player, message, args);
+      client.commands.get("play").execute(client.player, message, args);
       break;
     case "pause":
-      client.musicCommands.get("pause").execute(client.player, message);
+      client.commands.get("pause").execute(client.player, message);
       break;
     case "resume":
-      client.musicCommands.get("resume").execute(client.player, message);
+      client.commands.get("resume").execute(client.player, message);
       break;
     case "stop":
-      client.musicCommands.get("stop").execute(client.player, message);
+      client.commands.get("stop").execute(client.player, message);
       break;
     case "skip":
-      client.musicCommands.get("skip").execute(client.player, message);
+      client.commands.get("skip").execute(client.player, message);
       break;
   }
 });
