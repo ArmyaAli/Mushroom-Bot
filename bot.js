@@ -73,6 +73,9 @@ client.on("message", async (message) => {
     case "help":
       client.commands.get("help").execute(message);
       break;
+    case "help":
+      client.commands.get("help").execute(message);
+      break;
   }
 });
 
