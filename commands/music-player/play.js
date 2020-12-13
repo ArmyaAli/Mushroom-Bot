@@ -6,7 +6,7 @@ const filterOptions = {
 
 module.exports = {
   name: "play",
-  description: "play music",
+  description: "Plays music off of youtube!",
   async execute(player, message, args) {
     // check if there is a song already in queue
     const isPlaying = player.isPlaying(message.guild.id);
