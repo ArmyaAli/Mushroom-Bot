@@ -17,6 +17,9 @@ module.exports = {
         song = song.song;
         console.log(song.name);
         message.channel.send(`Started playing ${song.name}.`);
+        song.queue.on('end', () => {
+          message.channel.send('Mushroomie...! The queue is empty, please add new songs!');
+        });
       } else {
         // Add the song to the queue
         let song = await player.addToQueue(message.guild.id, searchString);
