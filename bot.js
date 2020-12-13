@@ -67,11 +67,11 @@ client.on("message", async (message) => {
     case "skip":
       client.commands.get("skip").execute(client.player, message);
       break;
-    case "help":
-      client.commands.get("help").execute(message);
-      break;
     case "queue":
       client.commands.get("queue").execute(client.player, message);
+      break;
+    case "help":
+      client.commands.get("help").execute(message);
       break;
   }
 });
