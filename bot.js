@@ -8,7 +8,7 @@ const client = new Discord.Client();
 client.commands = new Discord.Collection();
 
 const player = new Player(client, {
-  leaveOnEnd: true,
+  leaveOnEnd: false,
   leaveOnStop: true,
   leaveOnEmpty: true,
   quality: "high",
@@ -69,6 +69,9 @@ client.on("message", async (message) => {
       break;
     case "help":
       client.commands.get("help").execute(message);
+      break;
+    case "queue":
+      client.commands.get("queue").execute(client.player, message);
       break;
   }
 });
