@@ -1,5 +1,7 @@
 This is a discord bot that I made as small project for myself! It's called Mushroom-Bot
+
 Currently working features:
+
     - Music Player
         - Play a song -> !play args
         - Queue up songs -> !play args (while you have music playing)
