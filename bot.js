@@ -1,18 +1,19 @@
-const Discord = require("discord.js");
-const client = new Discord.Client();
 const fs = require("fs"); // talk to the filesystem on the os
+const Discord = require("discord.js");
 const config = require("./bot_config.js");
 const { Player } = require("discord-music-player");
 
+const client = new Discord.Client();
+
 const player = new Player(client, {
-  leaveOnEnd: false,
+  leaveOnEnd: true,
   leaveOnStop: true,
   leaveOnEmpty: true,
   quality: "high",
 });
 
 client.player = player;
-// CONSTANTS (TO DO SHOULD BE IN A SPERPATE FILE)
+// CONSTANTS (TO DO SHOULD BE IN A SEPERATE FILE)
 const generalChannel = "143853351103102976";
 const musicCommandPath = "./commands/music-player";
 const adminCommandPath = "./commands/admin";
