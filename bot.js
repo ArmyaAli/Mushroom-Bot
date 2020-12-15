@@ -2,6 +2,10 @@ const fs = require("fs");
 const path = require("path");
 const Discord = require("discord.js");
 const config = require("./bot_config.js");
+const general = require("./modules/generalHandler.js")
+const admin = require("./modules/adminHandler.js")
+const music = require("./modules/musicHandler.js")
+const ub = require("./modules/ubHandler.js")
 const { Player } = require("discord-music-player");
 
 const client = new Discord.Client();
@@ -48,55 +52,10 @@ client.on("message", async (message) => {
   if (!message.content.startsWith(config.prefix) || message.author.bot) return;
   const args = message.content.slice(config.prefix.length).trim().split(/ +/);
   const command = args.shift().toLowerCase();
-
-  const checkPermissions = (message, commandName) => {
-    let authorPerms = message.member.permissions;
-    return authorPerms.has(client.commands.get(commandName).requiredPermissions)
-  };
-
-  switch (command) {
-    case "play":
-      if (args.length == 0) {
-        message.channel.send("Arguments are required for that command!");
-        return;
-      }
-      client.commands.get("play").execute(client.player, message, args);
-      break;
-    case "pause":
-      client.commands.get("pause").execute(client.player, message);
-      break;
-    case "resume":
-      client.commands.get("resume").execute(client.player, message);
-      break;
-    case "stop":
-      client.commands.get("stop").execute(client.player, message);
-      break;
-    case "skip":
-      client.commands.get("skip").execute(client.player, message);
-      break;
-    case "queue":
-      client.commands.get("queue").execute(client.player, message);
-      break;
-    case "help":
-      client.commands.get("help").execute(message);
-      break;
-    case "kick":
-      if(!checkPermissions(message, "kick")) {
-        message.channel.send('You do not have the required permissions to excecute that command!')
-        return;
-      };
-      client.commands.get("kick").execute(message);
-      break;
-    case "clear":
-      if(!checkPermissions(message, "clear")) {
-        message.channel.send('You do not have the required permissions to excecute that command!')
-        return;
-      };
-      client.commands.get("clear").execute(message, args);
-      break;
-    default:
-      message.channel.send("That is not a valid command");
-  }
+  
+  general.commands(client, command, message, args);
+  admin.commands(client, command, message, args);
+  music.commands(client, command, message, args)
 });
 
 // sends a welcome message if a user joins
