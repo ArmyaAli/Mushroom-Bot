@@ -8,8 +8,9 @@ const music = require("./modules/musicHandler.js")
 const ub = require("./modules/ubHandler.js")
 const { Player } = require("discord-music-player");
 
+global.COMMAND_RAN = false;
+
 const client = new Discord.Client();
-client.commands = new Discord.Collection();
 
 const player = new Player(client, {
   leaveOnEnd: false,
@@ -19,6 +20,7 @@ const player = new Player(client, {
 });
 
 client.player = player;
+client.commands = new Discord.Collection();
 // CONSTANTS (TO DO SHOULD BE IN A SEPERATE FILE)
 const generalChannel = "143853351103102976";
 
@@ -52,10 +54,13 @@ client.on("message", async (message) => {
   if (!message.content.startsWith(config.prefix) || message.author.bot) return;
   const args = message.content.slice(config.prefix.length).trim().split(/ +/);
   const command = args.shift().toLowerCase();
-  
+
   general.commands(client, command, message, args);
   admin.commands(client, command, message, args);
   music.commands(client, command, message, args)
+
+  if(!global.COMMAND_RAN) 
+    message.channel.send("That is an invalid command");
 });
 
 // sends a welcome message if a user joins
