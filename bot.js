@@ -88,6 +88,10 @@ client.on("message", async (message) => {
       client.commands.get("kick").execute(message);
       break;
     case "clear":
+      if(!checkPermissions(message, "clear")) {
+        message.channel.send('You do not have the required permissions to excecute that command!')
+        return;
+      };
       client.commands.get("clear").execute(message, args);
       break;
     default:
