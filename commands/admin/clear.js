@@ -4,6 +4,7 @@ module.exports = {
   name: "clear",
   description:
     "Clear the currently wrote to channel: args: number (how many messages to delete) or 'nuke' (Clears everything in that channel)",
+    requiredPermissions: ['MANAGE_CHANNELS'],
   /**
    * This is a command
    * @param {Message} message
@@ -16,8 +17,9 @@ module.exports = {
         return;
       }  else {
         if(args.join() === "nuke") {
-          // grab the current channel id
-          await message.channel.clone();
+          const oldPosition = message.channel.position;
+          const newChannel = await message.channel.clone();
+          newChannel.setPosition(oldPosition);
           await message.channel.delete();
         } else {
           // must be a number!
