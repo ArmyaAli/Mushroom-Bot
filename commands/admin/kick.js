@@ -10,6 +10,7 @@ module.exports = {
    * @param {String[]} args
    */
   async execute(message) {
+    global.COMMAND_RAN = true;
     const mentionedMembers = await message.mentions.members;
       if(mentionedMembers.size > 1) {
         message.channel.send('You can only kick one user at a time! Please only mention one person to kick');

@@ -8,6 +8,7 @@ module.exports = {
   name: "play",
   description: "Plays music off of youtube!",
   async execute(player, message, args) {
+    global.COMMAND_RAN = true;
     // check if there is a song already in queue
     const isPlaying = player.isPlaying(message.guild.id);
     const searchString = args.join(' ');
