@@ -2,6 +2,7 @@ module.exports = {
     name: "stop",
     description: "stops the current song and clears the queue",
     execute(player, message) {
+      global.COMMAND_RAN = true;
       // check if there is a song already in queue
       let isPlaying = player.isPlaying(message.guild.id);
       try {
