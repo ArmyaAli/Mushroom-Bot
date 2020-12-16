@@ -24,7 +24,7 @@ module.exports = {
                           ${results[i].example}
                         `;
         await message.channel.send(new MessageEmbed()
-        .setTitle(`Word: ${searchQuery}, Thumbsup: ${results[i].thumbs_up}, Thumbsdown: ${results[i].thumbs_down}`)
+        .setTitle(`Word: ${searchQuery} UP: ${results[i].thumbs_up} DOWN: ${results[i].thumbs_down}`)
         .setColor(0xff0000)
         .setURL(results[i].permalink)
         .setDescription(msgFormat));
