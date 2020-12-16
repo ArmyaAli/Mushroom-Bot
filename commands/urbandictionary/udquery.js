@@ -6,7 +6,6 @@ module.exports = {
   description: "Queries urbandictionary using their public API!",
   async execute(message, args) {
     const searchQuery = args.join(" ");
-    console.log(searchQuery)
     const api = `http://api.urbandictionary.com/v0/define?term=${searchQuery}`;
     try {
       const rawdata = await fetch(api);
