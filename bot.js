@@ -5,7 +5,7 @@ const config = require("./bot_config.js");
 const general = require("./modules/generalHandler.js")
 const admin = require("./modules/adminHandler.js")
 const music = require("./modules/musicHandler.js")
-const ub = require("./modules/ubHandler.js")
+const ud = require("./modules/udHandler.js")
 const { Player } = require("discord-music-player");
 
 global.COMMAND_RAN = false;
@@ -57,7 +57,8 @@ client.on("message", async (message) => {
 
   general.commands(client, command, message, args);
   admin.commands(client, command, message, args);
-  music.commands(client, command, message, args)
+  music.commands(client, command, message, args);
+  ud.commands(client, command, message, args);
 
   if(!global.COMMAND_RAN) 
     message.channel.send("That is an invalid command");

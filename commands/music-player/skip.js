@@ -2,7 +2,6 @@ module.exports = {
     name: "skip",
     description: "stops the current song and clears the queue",
     async execute(player, message) {
-      global.COMMAND_RAN = true;
       // check if there is a song already in queue
       let isPlaying = player.isPlaying(message.guild.id);
       try {
