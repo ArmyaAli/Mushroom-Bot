@@ -1,4 +1,5 @@
-const https = require("http");
+const fetch = require('node-fetch');
+const { MessageEmbed }  = require('discord.js');
 
 module.exports = {
   name: "udquery",
@@ -6,22 +7,34 @@ module.exports = {
   async execute(message, args) {
     const searchQuery = args.join(" ");
     const api = `http://api.urbandictionary.com/v0/define?term=${searchQuery}`;
-    message.channel.send(searchQuery);
+    try {
+      const rawdata = await fetch(api);
+      const json = await rawdata.json();
+      const results = json.list.slice(0, 5);
+      if(results.length == 0) {
+        throw 'No results found! Try a different query';
+      }
+      const messageList = [];
+      for(let i = 0; i < results.length; ++i) {
+        const msgFormat = `Definition
+                          ${results[i].definition} 
 
-    https.get(api, (resp) => {
-        let data = "";
+                          Example
+                          ${results[i].example}
+                        `;
+        messageList.push(new MessageEmbed()
+        .setTitle(`Word: ${searchQuery}, Thumbsup: ${results[i].thumbs_up}, Thumbsdown: ${results[i].thumbs_down}`)
+        .setColor(0xff0000)
+        .setURL(results[i].permalink)
+        .setDescription(msgFormat));
+      }
 
-        // A chunk of data has been recieved.
-        resp.on("data", (chunk) => {
-          data += chunk;
-        });
-
-        // The whole response has been received. Print out the result.
-        resp.on("end", () => {
-          message.channel.send(`API RESPONSE: ${JSON.parse(data)}`);
-        });
-      }).on("error", (err) => {
-        console.log("Error: " + err.message);
-      });
+      for(const msg of messageList) {
+        message.channel.send(msg);
+      }
+    } catch(error) {
+      message.channel.send(`Error occured: ${error}`);
+    }
+  
   },
 };
