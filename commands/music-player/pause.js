@@ -2,7 +2,6 @@ module.exports = {
     name: "pause",
     description: "pause the currently running music",
     async execute(player, message) {
-      global.COMMAND_RAN = true;
       // check if there is a song already in queue
       let isPlaying = player.isPlaying(message.guild.id);
       try {

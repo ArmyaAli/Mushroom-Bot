@@ -13,7 +13,6 @@ module.exports = {
     name: "help",
     description: "Gives the user the list of basic commands",
     execute(message) {
-      global.COMMAND_RAN = true;
       message.channel.send('Here are a list of commands I can currently use!');
       message.channel.send(helpTemplate);
     },

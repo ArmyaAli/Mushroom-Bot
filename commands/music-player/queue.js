@@ -2,7 +2,6 @@ module.exports = {
     name: "queue",
     description: "Gets all music in the current song Queue.",
     async execute(player, message) {
-        global.COMMAND_RAN = true;
         let queue = await player.getQueue(message.guild.id);
         if(queue) {
             message.channel.send('Queue:\n'+(queue.songs.map((song, i) => {

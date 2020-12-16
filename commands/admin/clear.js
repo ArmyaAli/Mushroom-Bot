@@ -11,7 +11,6 @@ module.exports = {
    * @param {String[]} args
    */
   async execute(message, args) {
-    global.COMMAND_RAN = true;
     try {
       if (args.length > 1 || args.length == 0) {
         message.channel.send("This command takes ONE arguement and ONLY one arguement");

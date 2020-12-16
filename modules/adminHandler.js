@@ -3,6 +3,7 @@ const permissionHandler = require('./permissionManager.js');
 const commands = (client, command, message, args) => {
     switch (command) {
         case "kick":
+          global.COMMAND_RAN = true;
           if(!permissionHandler.checkPermissions(client, message, "kick")) {
             message.channel.send('You do not have the required permissions to excecute that command!')
             return;
@@ -10,6 +11,7 @@ const commands = (client, command, message, args) => {
           client.commands.get("kick").execute(message);
           break;
         case "clear":
+          global.COMMAND_RAN = true;
           if(!permissionHandler.checkPermissions(client, message, "clear")) {
             message.channel.send('You do not have the required permissions to excecute that command!')
             return;
