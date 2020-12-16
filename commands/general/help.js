@@ -1,5 +1,7 @@
 const helpTemplate = `
 Commands!
+  - Search urbandictionary.com
+    - !ud *query*
   - Music Player
       - !play *songname* -> Plays a song!
       - !queue -> returns all the songs in the queue listed out for you!
