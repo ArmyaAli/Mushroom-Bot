@@ -1,4 +1,4 @@
-# ILL BE MOVING AWAY FROM USING JAVASCRIPT AND MOVING MY BOT TO TYPESCRIPT - See the typescript mushroom bot repo for the recent version!
+## ILL BE MOVING AWAY FROM USING JAVASCRIPT AND MOVING MY BOT TO TYPESCRIPT - See the typescript mushroom bot repo for the recent version!
 This is a discord bot that I made as small project for myself! It's called Mushroom-Bot.
 
 
