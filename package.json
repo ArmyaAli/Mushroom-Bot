@@ -1,0 +1,41 @@
+{
+  "name": "mushroom-bot",
+  "version": "1.0.0",
+  "description": "discord music bot with an excellent music player ;)",
+  "main": "src/main.ts",
+  "scripts": {
+    "dev": "nodemon",
+    "lint": "eslint src/*",
+    "build": "tsc",
+    "deploy-slash-guild": "ts-node scripts/deploy-slash-commands.ts",
+    "deploy-slash-global": "ts-node scripts/deploy-slash-commands.ts global",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArmyaAli/Mushroom-Bot.git"
+  },
+  "keywords": [
+    "discord",
+    "discord-bot",
+    "discordbot"
+  ],
+  "author": "Ali Umar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ArmyaAli/Mushroom-Bot/issues"
+  },
+  "homepage": "https://github.com/ArmyaAli/Mushroom-Bot#readme",
+  "devDependencies": {
+    "dotenv": "^16.4.5",
+    "eslint": "^8.57.0",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2"
+  },
+  "dependencies": {
+    "@discordjs/voice": "^0.16.1",
+    "discord.js": "^14.14.1",
+    "scrape-youtube": "^2.4.0",
+    "ytdl-core": "^4.11.5"
+  }
+}

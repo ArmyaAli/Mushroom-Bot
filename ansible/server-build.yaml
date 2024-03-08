@@ -1,0 +1,9 @@
+---
+- hosts: all
+  become: true
+ tasks:
+    - name: Install dependencies
+      apt:
+        name: node
+        state: latest
+        update_cache: true
