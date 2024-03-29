@@ -1,15 +1,6 @@
 import { Command } from "../../def";
 import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { resolveQuery } from "../../music-player-api";
-
-//const fs = require('fs');
-//const ytdl = require('ytdl-core');
-//// TypeScript: import ytdl from 'ytdl-core'; with --esModuleInterop
-//// TypeScript: import * as ytdl from 'ytdl-core'; with --allowSyntheticDefaultImports
-//// TypeScript: import ytdl = require('ytdl-core'); with neither of the above
-//
-//ytdl('http://www.youtube.com/watch?v=aqz-KE-bpKQ')
-//  .pipe(fs.createWriteStream('video.mp4'));
+import { initPlayer, resolveQuery } from "../../music-player-api";
 
 const command: Command = {
     cooldown: 5,
@@ -31,12 +22,11 @@ const command: Command = {
         console.log(query)
 
         if(!query) {
-           await interaction.reply('You must specify a song / playlist to play'); 
+           await interaction.reply('You must specify something to play'); 
            return;
         }
 
         await resolveQuery(interaction, query)
-
     }
 
 }
