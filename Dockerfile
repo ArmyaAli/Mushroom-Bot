@@ -43,5 +43,8 @@ COPY dist/commands /bot/commands
 # Copy over everything else
 COPY dist/* .
 
+# Clean up
+RUN rm -rf /dist /node_modules /tsconfig.json /package.json /package-lock.json
+
 # Run main.js via Node runtime
 CMD [ "node", "main.js"]
