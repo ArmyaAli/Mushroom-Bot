@@ -1,14 +1,7 @@
 import { ChatInputCommandInteraction, User, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js'
-import { VoiceConnection, AudioPlayer } from '@discordjs/voice'
+import { VoiceConnection, AudioPlayer, PlayerSubscription } from '@discordjs/voice'
 
-export interface Command {
-    cooldown: number,
-    // NOTE(Ali): For some freakin' reason, data.setName() <- cannot contain capital chars
-    data: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
-    exec: (interaction: ChatInputCommandInteraction) => Promise<void>;
-}
-
-interface song {
+export interface Song {
   title: string;
   link: string;
   duration: string;
@@ -16,11 +9,20 @@ interface song {
 }
 
 export interface MusicPlayer {
-    connection: VoiceConnection;
     player: AudioPlayer;
-    queue: song[];
-    head?: song;
-    tail?: song;
-    current?: song;
+    connection: VoiceConnection;
+    queue: Song[];
+    subscription?: PlayerSubscription;
+    head?: Song;
+    tail?: Song;
+    current?: Song;
     playing: boolean;
+    lastInteraction: ChatInputCommandInteraction;
+}
+
+export interface Command {
+    cooldown: number,
+    // NOTE(Ali): For some freakin' reason, data.setName() <- cannot contain capital chars
+    data: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
+    exec: (interaction: ChatInputCommandInteraction) => Promise<void>;
 }
