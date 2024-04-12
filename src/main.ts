@@ -1,6 +1,13 @@
 // really only used for dev environment
 // on a server... environment variables will be handled by system
-// TODO(Ali): Figure out a better way for this, kinda smells
+// TODO(Ali): Figure out a better way for this, kinda smells.
+// 
+//
+// 04-11-2024
+// I still feel like this kinda smells. I don't want environment config within the codebase
+// I also don't want to put credentials in the codebase since * security
+// TODO(Ali): still not Started
+
 import 'dotenv/config';
 
 // BOOTSTRAP

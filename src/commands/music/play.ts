@@ -1,6 +1,6 @@
 import { Command } from "../../def";
 import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { initPlayer, resolveQuery } from "../../music-player-api";
+import { resolveQuery } from "../../music-player-api";
 
 const command: Command = {
     cooldown: 5,
@@ -10,6 +10,7 @@ const command: Command = {
         .addStringOption(option => {
           return option.setName('query')
           .setDescription('the thing to play')
+          .setRequired(true)
         }),
     exec: async function (interaction: ChatInputCommandInteraction) {
 
