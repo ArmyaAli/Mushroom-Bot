@@ -1,5 +1,5 @@
 import { Command } from "../../def";
-import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import { ChatInputCommandInteraction, SlashCommandBuilder, StringSelectMenuOptionBuilder, StringSelectMenuBuilder, ActionRowBuilder } from "discord.js";
 import { resolveQuery } from "../../music-player-api";
 
 const command: Command = {
