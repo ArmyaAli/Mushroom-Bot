@@ -63,9 +63,10 @@ export function registerAudioPlayerEvents(player: AudioPlayer, guildId: string) 
     if(musicPlayer.queue.length > 0) {
       const song = musicQueue.shift();
       if(!song) return;
-      playSong(musicPlayer, song);
+      playSong(musicPlayer.lastInteraction, musicPlayer, song);
       queryResponse(musicPlayer.lastInteraction, "Added your song to the Queue");
     } else {
+      // TODO(Ali): Play related songs when the Queue is empty. This should be toggleable by the user
       queryResponse(musicPlayer.lastInteraction, "No more songs in the Queue.");
     }
 
@@ -143,7 +144,8 @@ export function getPlayer(interaction: ChatInputCommandInteraction): MusicPlayer
       queue: [],
       playing: false,
       connection: conn,
-      lastInteraction: interaction
+      lastInteraction: interaction,
+      autoplay: true
     };
 
     // Register voice channel connection events
@@ -168,6 +170,7 @@ export async function resolveQuery(interaction: ChatInputCommandInteraction, que
     }
   }
 
+  console.log(qtype);
   if(qtype === null) qtype = queryType.SearchQuery;
 
   const routine = queryDispatchMap.get(qtype);
@@ -184,7 +187,6 @@ export async function resolveSearch(interaction: ChatInputCommandInteraction, qu
     try {
 
       let results = await play.search(query, { limit: 1 })
-      //const results = await yt.search(query);
 
       console.log(results);
       // Unless you specify a custom type you will only receive 'video' results
@@ -201,7 +203,7 @@ export async function resolveSearch(interaction: ChatInputCommandInteraction, qu
         requester: interaction.user 
       };
 
-      playSong(player, song);
+      playSong(interaction, player, song);
 
     } catch(error) {
       console.error(error);
@@ -209,7 +211,24 @@ export async function resolveSearch(interaction: ChatInputCommandInteraction, qu
 }
 
 export async function resolveYoutubeTrack(interaction: ChatInputCommandInteraction, query: string) {
-  console.log('youtube track')
+  const player = getPlayer(interaction) 
+
+  if(!player) return;
+
+  const results = await play.video_info(query);
+  let title = results.video_details.title;
+
+  // If video is untitled or doesn't have a title, let's add a filler
+  if(!title) title = "no title in the video" ;
+
+  const song: Song = {
+    title: title,
+    link: results.video_details.url,
+    duration: results.video_details.durationRaw,
+    requester: interaction.user 
+  };
+
+  playSong(interaction, player, song);
 }
 
 export async function resolveSpotifyTrack(interaction: ChatInputCommandInteraction, query: string) {
@@ -223,41 +242,47 @@ export async function resolveSpotifyPlaylist(interaction: ChatInputCommandIntera
 }
 
 export async function resolveYoutubePlaylist(interaction: ChatInputCommandInteraction, query: string) {
-  console.log('youtube playlist')
+   const results = await play.search(query, { limit: 1 })
+   console.log(results);
 
 }
 
-export async function playSong(player: MusicPlayer, song: Song) {
+export async function playSong(interaction: ChatInputCommandInteraction, player: MusicPlayer, song: Song, force?: boolean) {
   // If we are playing, we add the song the Music Queue
-  if(player.playing) {
+  if(player.playing && !force) {
     player.queue.push(song);
-    queryResponse(player.lastInteraction, `Added the track: ${song.title} to the Music Queue at the request of ${song.requester}`);
+    queryResponse(interaction, `Added the track: ${song.title} to the Music Queue at the request of ${song.requester}`);
     return;
   }
 
   // If we are not currently playing anything, we need to play something
-  //
-  // Download the song from youtube
-  // IMPORTANT(Ali) For some freakin' reason, highWaterMark has to be set to the below value 
-  // for the audio connection to not 
-  //const stream = ytdl(song.link, { filter: 'audioonly', highWaterMark: 1048576 / 4});
-
-  // Create an AudioResource for our AudioPLayer to play
-  //
-  let stream = await play.stream(song.link)
-  let resource = createAudioResource(stream.stream, { inputType: stream.type })
+  // Download the song from youtube and feed it to Discord somehow
+  const stream = await play.stream(song.link)
+  const resource = createAudioResource(stream.stream, { inputType: stream.type })
 
   // Create a subscription if it doesn't exist
   if(!player.subscription) player.subscription = player.connection.subscribe(player.player);
 
   // play our audio resource
   player.player.play(resource);
+
   // Set our player state to playing=true
   player.playing = true;
 
-  queryResponse(player.lastInteraction, `Playing the track: ${song.title} at the request of ${song.requester}`);
+  queryResponse(interaction, `Playing the track: ${song.title} at the request of ${song.requester}`);
 }
 
 export async function queryResponse(interaction: ChatInputCommandInteraction, message: string) {
   await interaction.reply(message);
+}
+
+export async function skipSong(interaction: ChatInputCommandInteraction, player: MusicPlayer) {
+  const next = player.queue.shift();
+
+  if(!next) {
+    queryResponse(interaction, "Queue is empty");
+    return;
+  }
+
+  playSong(interaction, player, next, true);
 }
