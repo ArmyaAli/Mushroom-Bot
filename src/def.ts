@@ -12,12 +12,13 @@ export interface MusicPlayer {
     player: AudioPlayer;
     connection: VoiceConnection;
     queue: Song[];
-    subscription?: PlayerSubscription;
-    head?: Song;
-    tail?: Song;
     current?: Song;
     playing: boolean;
     lastInteraction: ChatInputCommandInteraction;
+    autoplay: boolean;
+    tail?: Song;
+    head?: Song;
+    subscription?: PlayerSubscription;
 }
 
 export interface Command {
