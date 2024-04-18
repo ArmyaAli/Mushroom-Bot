@@ -18,8 +18,8 @@ import { resolveYoutubeTrack, resolveSpotifyTrack, resolveSpotifyPlaylist, resol
 // TODO(Ali): I don't think this piece of code belongs here. Let's find a new place to move it. The functionality is quite localized to the music-player-api and 
 // not really part of the entire system as a whole
 (async function setup() {
-  queryMap.set(queryType.YoutubeTrack, /https:\/\/www.youtube\.com\/watch?.*/);
-  queryMap.set(queryType.YoutubePlaylist, /https:\/\/youtube\.com\/playlist.*/);
+  queryMap.set(queryType.YoutubeTrack, /https:\/\/[www]{3}?\.youtube\.com\/watch?.*/);
+  queryMap.set(queryType.YoutubePlaylist, /https:\/\/[www]{3}?\.youtube\.com\/playlist?.*/);
   queryMap.set(queryType.SpotifyTrack, /https:\/\/(open\.?)spotify\.com\/track*/);
   queryMap.set(queryType.SpotifyPlaylist, /https:\/\/(open\.)?spotify\.com\/playlist*/);
 
