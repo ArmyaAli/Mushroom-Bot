@@ -242,9 +242,26 @@ export async function resolveSpotifyPlaylist(interaction: ChatInputCommandIntera
 }
 
 export async function resolveYoutubePlaylist(interaction: ChatInputCommandInteraction, query: string) {
-   const results = await play.search(query, { limit: 1 })
-   console.log(results);
+   const player = getPlayer(interaction) 
+   const playlist = await play.playlist_info(query);
+   const songs = await playlist.all_videos();
+ 
+   if(!player) return;
 
+   if(!player.playing) {
+     await playSong(interaction, player, { title: songs[0].title ?? "ERROR: Unable to get title from search result", link: songs[0].url, duration: songs[0].durationRaw, requester: interaction.user ?? "Unknown" })
+     songs.shift();
+   }
+
+   for(let i = 0; i < songs.length; ++i) {
+      let title       = songs[i]?.title; 
+      const link      = songs[i]?.url; 
+      const duration  = songs[i]?.durationRaw; 
+      const requester = interaction.user;
+
+      if(!title) title = "ERROR: Unable to get title from search result";
+      player.queue.push({ title: title, link: link, duration: duration, requester: requester });
+   }
 }
 
 export async function playSong(interaction: ChatInputCommandInteraction, player: MusicPlayer, song: Song, force?: boolean) {
@@ -272,6 +289,7 @@ export async function playSong(interaction: ChatInputCommandInteraction, player:
   queryResponse(interaction, `Playing the track: ${song.title} at the request of ${song.requester}`);
 }
 
+
 export async function queryResponse(interaction: ChatInputCommandInteraction, message: string) {
   await interaction.reply(message);
 }
@@ -285,4 +303,16 @@ export async function skipSong(interaction: ChatInputCommandInteraction, player:
   }
 
   playSong(interaction, player, next, true);
+}
+
+export async function displayQueue(interaction: ChatInputCommandInteraction, player: MusicPlayer) {
+  const total = player.queue.length;
+  let queue = `There are a total of ${total} songs in the Queue.\n`;
+
+  for(let i = 0; i < total && i < 10; ++i) {
+    const curr = player.queue[i];
+    queue += `${i + 1}. ${curr.title} - requested by: ${curr.requester}\n`;
+  }
+
+  interaction.reply(queue);
 }
