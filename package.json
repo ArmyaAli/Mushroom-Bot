@@ -1,0 +1,25 @@
+{
+  "name": "mushroom-bot",
+  "version": "1.0.0",
+  "description": "A music bot with an excellent music player",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon --exec ts-node src/main.ts",
+    "deploy" : "ts-node deploy-commands.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@discordjs/voice": "^0.18.0",
+    "discord.js": "^14.21.0",
+    "dotenv": "^17.2.1",
+    "libsodium-wrappers": "^0.7.15"
+  }
+}
