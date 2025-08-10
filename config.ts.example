@@ -1,0 +1,18 @@
+imort { Config } from './types';
+
+export const config: Config = {
+  // The version of Node.js to use.
+  nodeVersion: "",
+
+  // The ID of the Discord application.
+  discordAppId: "",
+
+  // The secret of the Discord application.
+  discordAppSecret: "",
+
+  // The token of the Discord bot.
+  discordToken: "",
+
+  // The ID of the Discord guild.
+  discordGuildId: "",
+};
