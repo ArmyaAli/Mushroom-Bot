@@ -1,4 +1,5 @@
-import { SlashCommandBuilder, Collection, Client, ChatInputCommandInteraction, GatewayIntentBits, Interaction, Events } from "discord.js";
+import { SlashCommandBuilder, Collection, Client, ChatInputCommandInteraction, GatewayIntentBits, Interaction, Events, SlashCommandOptionsOnlyBuilder } from "discord.js";
+import { Logger, LogLevel } from './utils/logger';
 
 export interface Config {
   nodeVersion: string;
@@ -14,11 +15,21 @@ export interface DiscordEvent {
 };
 
 export interface Command {
-  data: SlashCommandBuilder;
+  data: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder;
   execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
 };
 
 export class MushroomBot {
   commands: Collection<string, Command> = new Collection();
   discord_client: Client | null = null;
+  logger: Logger;
+
+  constructor() {
+    this.logger = Logger.getInstance({
+      level: LogLevel.INFO,
+      logDir: './logs',
+      filename: 'discord-bot.log',
+      enableConsole: true
+    });
+  }
 };

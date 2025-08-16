@@ -4,21 +4,26 @@
   "description": "A music bot with an excellent music player",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "dev": "nodemon --exec ts-node src/main.ts",
-    "deploy": "ts-node deploy-commands.ts"
+    "deploy": "ts-node scripts/deploy-commands.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.0.5",
     "nodemon": "^3.1.10",
+    "ts-jest": "^29.4.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@discordjs/voice": "^0.18.0",
-    "discord.js": "^14.21.0",
-    "libsodium-wrappers": "^0.7.15"
+  "@discordjs/voice": "^0.18.0",
+  "discord.js": "^14.21.0",
+  "libsodium-wrappers": "^0.7.15"
   }
 }
