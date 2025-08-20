@@ -1,7 +1,7 @@
 import { Events, Interaction, InteractionType } from 'discord.js';
 import { DiscordEvent, MushroomBot } from '../types';
 import { getPlayer } from '../music/Player';
-import { searchModal, buildPrimaryControls, buildAdvancedControls } from '../gui/MusicPlayer';
+import { searchModal, buildPrimaryControls, buildAdvancedControls } from '../Gui/MusicPlayer';
 
 const event: DiscordEvent = {
   name: Events.InteractionCreate,

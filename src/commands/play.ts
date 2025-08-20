@@ -13,23 +13,35 @@ const command: Command = {
       option.setName('query')
         .setDescription('Song name or URL (currently not processed).')
         .setRequired(true)),
-  async execute(interaction: ChatInputCommandInteraction) {
-    const logger = Logger.getInstance();
-    const query = interaction.options.getString('query', true).trim();
-    if(!interaction) return;
-    await interaction.deferReply();
 
-    if(!(await inVoice(interaction))) return;
+  async execute(interaction: ChatInputCommandInteraction) {
+    //const logger = Logger.getInstance();
+    const query = interaction.options.getString('query', true).trim();
+    if(!interaction) {
+      console.log("Interaction is Null")
+      return;
+    }
+    //await interaction.deferReply();
+
+    if(!(await inVoice(interaction))){
+      console.log("InVoice not returning anything")
+      return;
+    }
 
     // Extract video ID from YouTube URL or use query as-is
-    const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
-    const match = query.match(youtubeRegex);
-    const url = match ? `https://www.youtube.com/watch?v=${match[1]}` : query;
+    //const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
+    //const match = query.match(youtubeRegex);
+    //const url = match ? `https://www.youtube.com/watch?v=${match[1]}` : query;
 
     const player = getPlayer(interaction.guildId!);
-    await player.connect(interaction.member.voice.channel);
-
-    player.enqueue({ title: query, url: url, requestedBy: interaction.user.id });
+    
+    //
+    const member = interaction.member
+    if (member && member instanceof GuildMember && member.voice.channel){
+      player.connect(member.voice.channel)
+    }
+    
+    //player.enqueue({ title: query, url: url, requestedBy: interaction.user.id });
 
     const wasFirstPlay = !player.hasPlayedBefore();
     player.play();

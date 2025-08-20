@@ -1,5 +1,4 @@
 import { REST, Routes, SlashCommandBuilder} from 'discord.js';
-import { config } from '../src/config';
 import { Command } from '../src/types';
 import fs from 'node:fs';
 import path from 'node:path';
