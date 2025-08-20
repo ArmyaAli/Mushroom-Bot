@@ -1,6 +1,7 @@
-import { AudioPlayer, createAudioPlayer, NoSubscriberBehavior, AudioPlayerStatus, entersState, VoiceConnectionDisconnectReason, joinVoiceChannel, VoiceConnectionStatus, VoiceConnection } from '@discordjs/voice';
+import { AudioPlayer, createAudioPlayer, NoSubscriberBehavior, AudioPlayerStatus, entersState, VoiceConnectionDisconnectReason, joinVoiceChannel, VoiceConnectionStatus, VoiceConnection, createAudioResource, AudioResource } from '@discordjs/voice';
 import { VoiceBasedChannel } from 'discord.js';
 import { Logger } from '../utils/logger';
+import { YtDlp } from 'ytdlp-nodejs';
 
 export interface QueueItem {
   title: string;
@@ -9,31 +10,34 @@ export interface QueueItem {
 }
 
 export class MusicPlayer {
+  // Basic state
   private hasPlayed = false;
-  private autoplay = false;
-  private volume = 100;
+  private autoplay = false; // placeholder for future related-track feature
+  private volume = 100;     // 0 - 200 (scaled percent)
   private muted = false;
 
+  // Core runtime objects
   private queue: QueueItem[] = [];
   private audioPlayer: AudioPlayer;
   private connection: VoiceConnection | null = null;
   private current: QueueItem | null = null;
+  private currentResource: AudioResource | null = null;
+
+  // Support
   private logger: Logger;
+  private ytdlp: YtDlp;
   private consecutiveFailures = 0;
-  // Placeholder: no external YouTube libraries; user will supply implementation later.
 
   constructor() {
-    this.audioPlayer = createAudioPlayer({
-      behaviors: {
-        noSubscriber: NoSubscriberBehavior.Pause
-      }
+    this.audioPlayer = createAudioPlayer({ behaviors: { noSubscriber: NoSubscriberBehavior.Pause } });
+    this.logger = Logger.getInstance();
+    this.ytdlp = new YtDlp({
+      binaryPath: process.platform === 'win32' ? 'yt-dlp.exe' : 'yt-dlp'
     });
 
-    // Reuse global logger instance (must have been initialized elsewhere)
-    this.logger = Logger.getInstance();
-
+    // When a track finishes, advance automatically
     this.audioPlayer.on(AudioPlayerStatus.Idle, () => {
-      this.playNext();
+      void this.playNext();
     });
   }
 
@@ -43,11 +47,11 @@ export class MusicPlayer {
       channelId: channel.id,
       guildId: channel.guild.id,
       adapterCreator: channel.guild.voiceAdapterCreator,
-      selfDeaf: false, // Set to false so the bot doesn't appear deafened (optional)
-      selfMute: false  // Ensure bot isn't self-muted
+      selfDeaf: false,
+      selfMute: false
     });
 
-    this.connection.on(VoiceConnectionStatus.Disconnected, async (oldState, newState) => {
+    this.connection.on(VoiceConnectionStatus.Disconnected, async (_old, newState) => {
       if (newState.reason === VoiceConnectionDisconnectReason.WebSocketClose && newState.closeCode === 4014) {
         try {
           await entersState(this.connection!, VoiceConnectionStatus.Connecting, 5_000);
@@ -68,58 +72,93 @@ export class MusicPlayer {
   }
 
   public enqueue(item: QueueItem) {
-    this.logger.debug('Enqueue track', { title: item.title, url: item.url, requestedBy: item.requestedBy });
+    this.logger.debug('Enqueue', { title: item.title, url: item.url, requestedBy: item.requestedBy });
     this.queue.push(item);
-    if (!this.current) {
-      this.playNext();
-    }
+    if (!this.current) void this.playNext();
   }
 
   private async playNext(): Promise<void> {
     this.current = this.queue.shift() || null;
     if (!this.current) {
-      if (this.autoplay) {
-        // TODO: Implement actual autoplay (fetch related track)
-        this.logger.debug('Autoplay: Adding dummy related track');
-        this.enqueue({
-          title: 'Dummy Autoplay Track',
-          url: 'dummy-autoplay-url',
-          requestedBy: 'autoplay'
-        });
-        return this.playNext();
-      }
-      this.logger.debug('Queue ended');
+      // Autoplay placeholder: no action yet.
       return;
     }
 
     if (!this.current.url) {
       this.logger.error('Current track missing URL, skipping', { track: this.current });
       this.current = null;
-      return this.playNext();
+      return void this.playNext();
     }
 
-  // Streaming removed; just skip items until queue empty.
-  this.logger.warn('Playback disabled (no media libraries). Skipping track.', { title: this.current.title, url: this.current.url });
-  this.current = null;
-  return this.playNext();
+    try {
+      // Get video info for metadata and format selection
+      const info: any = await this.ytdlp.getInfoAsync(this.current.url);
+      
+      // Handle playlists by taking the first entry
+      if (info._type === 'playlist' && Array.isArray(info.entries) && info.entries.length) {
+        const first = info.entries[0];
+        if (first?.title) this.current.title = first.title;
+      } else if (info.title) {
+        this.current.title = info.title;
+      }
+
+      // Get stream with best audio quality
+      const stream = await this.ytdlp.stream(this.current.url, {
+        format: {
+          filter: 'audioonly' as const
+        }
+      });
+
+      if (!stream) {
+        throw new Error('Failed to create audio stream');
+      }
+
+      // Create and play resource
+      const resource = createAudioResource(stream as any, { inlineVolume: true });
+      this.currentResource = resource;
+      this.applyVolume();
+      this.audioPlayer.play(resource);
+      
+      this.logger.info('Playing', { 
+        title: this.current.title, 
+        url: this.current.url,
+        duration: info.duration ? new Date(info.duration * 1000).toISOString().slice(11, 19) : 'unknown'
+      });
+      
+      this.consecutiveFailures = 0;
+
+    } catch (err) {
+      this.logger.error('Playback error', { 
+        error: (err as Error).message, 
+        url: this.current?.url,
+        stack: (err as Error).stack
+      });
+      
+      this.current = null;
+      this.consecutiveFailures++;
+      
+      if (this.consecutiveFailures >= 5) {
+        this.logger.error('Too many failures; clearing queue');
+        this.queue = [];
+        this.consecutiveFailures = 0;
+        return;
+      }
+      
+      return void this.playNext();
+    }
   }
 
   public play() {
     if (this.audioPlayer.state.status === AudioPlayerStatus.Paused) {
       this.audioPlayer.unpause();
     } else if (this.audioPlayer.state.status === AudioPlayerStatus.Idle && this.queue.length > 0) {
-      this.playNext();
+      void this.playNext();
     }
     this.hasPlayed = true;
   }
 
-  public pause() {
-    this.audioPlayer.pause();
-  }
-
-  public resume() {
-    this.audioPlayer.unpause();
-  }
+  public pause() { this.audioPlayer.pause(); }
+  public resume() { this.audioPlayer.unpause(); }
 
   public togglePause(): boolean {
     if (this.audioPlayer.state.status === AudioPlayerStatus.Playing) {
@@ -130,91 +169,44 @@ export class MusicPlayer {
       this.audioPlayer.unpause();
       return false; // now playing
     }
-    // If idle, treat as starting playback if queue exists
-    if (this.queue.length > 0) {
+    if (this.audioPlayer.state.status === AudioPlayerStatus.Idle && this.queue.length > 0) {
       this.play();
       return false;
     }
-    return false;
+  return false;
   }
 
-  public isPaused(): boolean {
-    return this.audioPlayer.state.status === AudioPlayerStatus.Paused;
-  }
+  public isPaused() { return this.audioPlayer.state.status === 'paused'; }
+  public isPlaying() { return this.audioPlayer.state.status === 'playing'; }
+  public isIdle() { return this.audioPlayer.state.status === 'idle'; }
+  public hasQueue() { return this.queue.length > 0; }
+  public isActive() { return this.isPlaying() || this.isPaused(); }
 
-  public isPlaying(): boolean {
-    return this.audioPlayer.state.status === AudioPlayerStatus.Playing;
-  }
+  public stop() { this.audioPlayer.stop(); this.queue = []; this.current = null; }
+  public shuffle() { this.queue = [...this.queue].sort(() => Math.random() - 0.5); }
 
-  public isIdle(): boolean {
-    return this.audioPlayer.state.status === AudioPlayerStatus.Idle;
-  }
+  public toggleAutoplay() { this.autoplay = !this.autoplay; return this.autoplay; }
+  public getAutoplay() { return this.autoplay; }
 
-  public hasQueue(): boolean {
-    return this.queue.length > 0;
-  }
+  public setVolume(volume: number) { this.volume = Math.max(0, Math.min(200, volume)); this.applyVolume(); }
+  public getVolume() { return this.volume; }
+  public toggleMute() { this.muted = !this.muted; this.applyVolume(); return this.muted; }
+  public isMuted() { return this.muted; }
+  public hasPlayedBefore() { return this.hasPlayed; }
+  public getQueue() { return this.queue; }
+  public getCurrent() { return this.current; }
 
-  public isActive(): boolean {
-    return this.isPlaying() || this.isPaused();
+  private applyVolume() {
+    if (!this.currentResource) return;
+    const volNode = (this.currentResource as any).volume;
+    if (!volNode) return;
+    const target = this.muted ? 0 : this.volume / 100;
+    try { volNode.setVolume(target); } catch {/* ignore */}
   }
-
-  public stop() {
-    this.audioPlayer.stop();
-    this.queue = [];
-    this.current = null;
-  }
-
-  public shuffle() {
-    this.queue = this.queue.sort(() => Math.random() - 0.5);
-  }
-
-  public toggleAutoplay(): boolean {
-    this.autoplay = !this.autoplay;
-    return this.autoplay;
-  }
-
-  public getAutoplay(): boolean {
-    return this.autoplay;
-  }
-
-  public setVolume(volume: number) {
-    this.volume = Math.max(0, Math.min(200, volume));
-    // TODO: Apply to audio resource when playback enabled
-  }
-
-  public getVolume(): number {
-    return this.volume;
-  }
-
-  public toggleMute(): boolean {
-    this.muted = !this.muted;
-    return this.muted;
-  }
-
-  public isMuted(): boolean {
-    return this.muted;
-  }
-
-  public hasPlayedBefore(): boolean {
-    return this.hasPlayed;
-  }
-
-  public getQueue() {
-    return this.queue;
-  }
-
-  public getCurrent() {
-    return this.current;
-  }
-
-  // No sanitize or fallback methods: user will implement when selecting dependencies.
 }
 
 export const players = new Map<string, MusicPlayer>();
-
 export function getPlayer(guildId: string) {
-  if (!players.has(guildId)) {
-    players.set(guildId, new MusicPlayer());
-  }
+  if (!players.has(guildId)) players.set(guildId, new MusicPlayer());
   return players.get(guildId)!;
 }
