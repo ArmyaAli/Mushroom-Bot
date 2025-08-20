@@ -1,4 +1,10 @@
-imort { Config } from './types';
+interface Config {
+  nodeVersion: string;
+  discordAppId: string;
+  discordAppSecret: string;
+  discordToken: string;
+  discordGuildId: string;
+}
 
 export const config: Config = {
   // The version of Node.js to use.
